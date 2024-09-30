@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -O3
 
 # Target to build
-TARGET = hashcalc
+TARGET = HashTimeChecker
 LDFLAGS = -o $(TARGET)
 
 # Libraries
