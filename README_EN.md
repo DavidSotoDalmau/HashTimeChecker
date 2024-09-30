@@ -34,8 +34,10 @@ Hash Calculator is a command-line tool for calculating the times of various cryp
 
 ### On Linux
 
-gcc -O3 -o hash_calculator hashes.c blake2b.c blake2b-ref.c blake2bp.c blake2bp-ref.c blake3.c -lssl -lcrypto
+- git clone https://github.com/DavidSotoDalmau/HashTimeChecker.git 
+- cd HashTimeChecker
+- make
 
-## Usage
+## Uso
 
-hash_calculator "TEXT_TO_BE_HASHED"
+- HashTimeChecker "TEXT_TO_BE_HASHED"
