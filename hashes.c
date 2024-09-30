@@ -21,7 +21,8 @@ void print_hash(const char *algorithm, unsigned char *hash, size_t length) {
 
 void calculate_time(struct timespec start, struct timespec end) {
     double time_taken = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf("Time: %.9f seconds\n", time_taken);
+    double microseconds = time_taken*1000000;
+    printf("Time: %.6f microseconds\n", microseconds);
 }
 
 int main(int argc, char *argv[]) {
@@ -48,6 +49,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("MD5", md5_hash, MD5_DIGEST_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // SHA1
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -55,6 +57,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("SHA1", sha1_hash, SHA_DIGEST_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // SHA-256 
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -62,6 +65,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("SHA-256", sha256_hash, SHA256_DIGEST_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // SHA-512
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -69,7 +73,8 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("SHA-512", sha512_hash, SHA512_DIGEST_LENGTH);
     calculate_time(start, end);
-    
+    printf("\n");
+
     // SHA3-256
     clock_gettime(CLOCK_MONOTONIC, &start);
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
@@ -80,6 +85,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("SHA3-256", sha3_256_hash, SHA256_DIGEST_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // SHA3-512
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -91,6 +97,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("SHA3-512", sha3_512_hash, SHA512_DIGEST_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // RIPEMD-160
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -98,6 +105,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("RIPEMD-160", ripemd160_hash, RIPEMD160_DIGEST_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // BLAKE2b (ref)
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -105,6 +113,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("BLAKE2b (ref)", blake2_hash, HASH_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // BLAKE2bp (ref)
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -112,6 +121,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("BLAKE2bp (ref)", blake2_hash, HASH_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // BLAKE2b (sse)
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -119,6 +129,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("BLAKE2b (sse)", blake2_hash, HASH_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // BLAKE2bp (sse)
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -126,6 +137,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("BLAKE2bp (sse)", blake2_hash, HASH_LENGTH);
     calculate_time(start, end);
+    printf("\n");
 
     // BLAKE3
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -136,5 +148,7 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     print_hash("BLAKE3", blake3_hash, HASH_LENGTH);
     calculate_time(start, end);
+    printf("\n\n");
+    
     return 0;
 }
