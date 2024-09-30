@@ -34,10 +34,10 @@ Hash Calculator es una herramienta de línea de comandos para calcular los tiemp
 
 ### En Linux
 
-git clone https://github.com/DavidSotoDalmau/HashTimeChecker.git 
-cd HashTimeChecker
-make
+- git clone https://github.com/DavidSotoDalmau/HashTimeChecker.git 
+- cd HashTimeChecker
+- make
 
 ## Uso
 
-HashTimeChecker "TEXTO_A_HASHEAR"
+- HashTimeChecker "TEXTO_A_HASHEAR"
