@@ -34,5 +34,8 @@ Hash Calculator es una herramienta de línea de comandos para calcular los tiemp
 
 ### En Linux
 
-```sh
 gcc -O3 -o hash_calculator hashes.c blake2b.c blake2b-ref.c blake2bp.c blake2bp-ref.c blake3.c -lssl -lcrypto
+
+## Uso
+
+hash_calculator "TEXTO_A_HASHEAR"
