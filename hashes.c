@@ -30,13 +30,13 @@ void print_time(const char *algorithm, double total_time, int iterations) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <string> <iterations>\n", argv[0]);
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "Usage: %s <string> [iterations]\n", argv[0]);
         return 1;
     }
 
     const char *input = argv[1];
-    int iterations = atoi(argv[2]);
+    int iterations = (argc == 3) ? atoi(argv[2]) : 1;
     unsigned char md5_hash[MD5_DIGEST_LENGTH];
     unsigned char sha1_hash[SHA_DIGEST_LENGTH];
     unsigned char blake2_hash[HASH_LENGTH];
