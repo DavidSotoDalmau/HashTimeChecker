@@ -9,7 +9,7 @@
 #include "blake2.h"
 #include "blake3.h"
 
-#define HASH_LENGTH 16
+#define DEFAULT_HASH_LENGTH 16
 #define NUM_ALGORITHMS 12
 
 typedef struct {
@@ -69,32 +69,73 @@ void print_colored_summary(HashAlgorithm *algorithms, int num_algorithms) {
     }
 }
 
+int read_file(const char *filename, unsigned char **buffer, size_t *length) {
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        perror("Error opening file");
+        return -1;
+    }
+
+    fseek(file, 0, SEEK_END);
+    *length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    *buffer = malloc(*length);
+    if (!*buffer) {
+        perror("Error allocating memory");
+        fclose(file);
+        return -1;
+    }
+
+    fread(*buffer, 1, *length, file);
+    fclose(file);
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
-    if (argc < 2 || argc > 4) {
-        fprintf(stderr, "Usage: %s <string> [iterations] [--summary]\n", argv[0]);
+    if (argc < 2 || argc > 6) {
+        fprintf(stderr, "Usage: %s <string|file> [iterations] [--summary] [--file] [--output-length=<value>]\n", argv[0]);
         return 1;
     }
 
     const char *input = argv[1];
     int iterations = 1;
     int show_summary = 0;
+    int is_file = 0;
+    size_t output_length = DEFAULT_HASH_LENGTH;
 
-    if (argc >= 3) {
-        if (strcmp(argv[2], "--summary") == 0) {
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--summary") == 0) {
             show_summary = 1;
-        } else {
-            iterations = atoi(argv[2]);
+        } else if (strcmp(argv[i], "--file") == 0) {
+            is_file = 1;
+        } else if (strncmp(argv[i], "--output-length=", 16) == 0) {
+            output_length = atoi(argv[i] + 16);
+        } else if (isdigit(argv[i][0])) {
+            iterations = atoi(argv[i]);
         }
     }
 
-    if (argc == 4 && strcmp(argv[3], "--summary") == 0) {
-        show_summary = 1;
+    unsigned char *data;
+    size_t data_length;
+
+    if (is_file) {
+        if (read_file(input, &data, &data_length) != 0) {
+            return 1;
+        }
+    } else {
+        data = (unsigned char *)input;
+        data_length = strlen(input);
     }
+
+    // Imprimir datos de entrada y longitud
+    printf("Data: %s\n", data);
+    printf("Data Length: %zu\n", data_length);
 
     unsigned char md5_hash[MD5_DIGEST_LENGTH];
     unsigned char sha1_hash[SHA_DIGEST_LENGTH];
-    unsigned char blake2_hash[HASH_LENGTH];
-    unsigned char blake3_hash[HASH_LENGTH];
+    unsigned char blake2_hash[output_length];
+    unsigned char blake3_hash[output_length];
     unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
     unsigned char sha512_hash[SHA512_DIGEST_LENGTH];
     unsigned char sha3_256_hash[SHA256_DIGEST_LENGTH];
@@ -121,7 +162,7 @@ int main(int argc, char *argv[]) {
     // MD5
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        MD5((unsigned char*)input, strlen(input), md5_hash);
+        MD5(data, data_length, md5_hash);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[0].total_time += current_time;
@@ -136,7 +177,7 @@ int main(int argc, char *argv[]) {
     // SHA1
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        SHA1((unsigned char*)input, strlen(input), sha1_hash);
+        SHA1(data, data_length, sha1_hash);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[1].total_time += current_time;
@@ -151,7 +192,7 @@ int main(int argc, char *argv[]) {
     // SHA-256 
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        SHA256((unsigned char*)input, strlen(input), sha256_hash);
+        SHA256(data, data_length, sha256_hash);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[2].total_time += current_time;
@@ -166,7 +207,7 @@ int main(int argc, char *argv[]) {
     // SHA-512
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        SHA512((unsigned char*)input, strlen(input), sha512_hash);
+        SHA512(data, data_length, sha512_hash);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[3].total_time += current_time;
@@ -183,7 +224,7 @@ int main(int argc, char *argv[]) {
         clock_gettime(CLOCK_MONOTONIC, &start);
         EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
         EVP_DigestInit_ex(mdctx, EVP_sha3_256(), NULL);
-        EVP_DigestUpdate(mdctx, input, strlen(input));
+        EVP_DigestUpdate(mdctx, data, data_length);
         EVP_DigestFinal_ex(mdctx, sha3_256_hash, NULL);
         EVP_MD_CTX_free(mdctx);
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -202,7 +243,7 @@ int main(int argc, char *argv[]) {
         clock_gettime(CLOCK_MONOTONIC, &start);
         EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
         EVP_DigestInit_ex(mdctx, EVP_sha3_512(), NULL);
-        EVP_DigestUpdate(mdctx, input, strlen(input));
+        EVP_DigestUpdate(mdctx, data, data_length);
         EVP_DigestFinal_ex(mdctx, sha3_512_hash, NULL);
         EVP_MD_CTX_free(mdctx);
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -219,7 +260,7 @@ int main(int argc, char *argv[]) {
     // RIPEMD-160
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        RIPEMD160((unsigned char*)input, strlen(input), ripemd160_hash);
+        RIPEMD160(data, data_length, ripemd160_hash);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[6].total_time += current_time;
@@ -234,7 +275,7 @@ int main(int argc, char *argv[]) {
     // BLAKE2b (ref)
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        blake2refb(blake2_hash, HASH_LENGTH, input, strlen(input), NULL, 0);
+        blake2b(blake2_hash, output_length, data, data_length, NULL, 0);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[7].total_time += current_time;
@@ -242,14 +283,14 @@ int main(int argc, char *argv[]) {
         if (current_time > algorithms[7].max_time) algorithms[7].max_time = current_time;
     }
     algorithms[7].avg_time = algorithms[7].total_time / iterations;
-    print_hash("BLAKE2b (ref)", blake2_hash, HASH_LENGTH);
+    print_hash("BLAKE2b (ref)", blake2_hash, output_length);
     print_time("BLAKE2b (ref)", algorithms[7].total_time, algorithms[7].min_time, algorithms[7].max_time, iterations);
     printf("\n");
 
     // BLAKE2bp (ref)
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        blake2refbp(blake2_hash, HASH_LENGTH, input, strlen(input), NULL, 0);
+        blake2bp(blake2_hash, output_length, data, data_length, NULL, 0);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[8].total_time += current_time;
@@ -257,14 +298,14 @@ int main(int argc, char *argv[]) {
         if (current_time > algorithms[8].max_time) algorithms[8].max_time = current_time;
     }
     algorithms[8].avg_time = algorithms[8].total_time / iterations;
-    print_hash("BLAKE2bp (ref)", blake2_hash, HASH_LENGTH);
+    print_hash("BLAKE2bp (ref)", blake2_hash, output_length);
     print_time("BLAKE2bp (ref)", algorithms[8].total_time, algorithms[8].min_time, algorithms[8].max_time, iterations);
     printf("\n");
 
     // BLAKE2b (sse)
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        blake2b(blake2_hash, HASH_LENGTH, input, strlen(input), NULL, 0);
+        blake2b(blake2_hash, output_length, data, data_length, NULL, 0);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[9].total_time += current_time;
@@ -272,14 +313,14 @@ int main(int argc, char *argv[]) {
         if (current_time > algorithms[9].max_time) algorithms[9].max_time = current_time;
     }
     algorithms[9].avg_time = algorithms[9].total_time / iterations;
-    print_hash("BLAKE2b (sse)", blake2_hash, HASH_LENGTH);
+    print_hash("BLAKE2b (sse)", blake2_hash, output_length);
     print_time("BLAKE2b (sse)", algorithms[9].total_time, algorithms[9].min_time, algorithms[9].max_time, iterations);
     printf("\n");
 
     // BLAKE2bp (sse)
     for (int i = 0; i < iterations; i++) {
         clock_gettime(CLOCK_MONOTONIC, &start);
-        blake2bp(blake2_hash, HASH_LENGTH, input, strlen(input), NULL, 0);
+        blake2bp(blake2_hash, output_length, data, data_length, NULL, 0);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[10].total_time += current_time;
@@ -287,7 +328,7 @@ int main(int argc, char *argv[]) {
         if (current_time > algorithms[10].max_time) algorithms[10].max_time = current_time;
     }
     algorithms[10].avg_time = algorithms[10].total_time / iterations;
-    print_hash("BLAKE2bp (sse)", blake2_hash, HASH_LENGTH);
+    print_hash("BLAKE2bp (sse)", blake2_hash, output_length);
     print_time("BLAKE2bp (sse)", algorithms[10].total_time, algorithms[10].min_time, algorithms[10].max_time, iterations);
     printf("\n");
 
@@ -296,8 +337,8 @@ int main(int argc, char *argv[]) {
         clock_gettime(CLOCK_MONOTONIC, &start);
         struct blake3 hasher;
         blake3_init(&hasher);
-        blake3_update(&hasher, input, strlen(input));
-        blake3_out(&hasher, blake3_hash, HASH_LENGTH);
+        blake3_update(&hasher, data, data_length);
+        blake3_out(&hasher, blake3_hash, output_length);
         clock_gettime(CLOCK_MONOTONIC, &end);
         current_time = calculate_time(start, end);
         algorithms[11].total_time += current_time;
@@ -305,7 +346,7 @@ int main(int argc, char *argv[]) {
         if (current_time > algorithms[11].max_time) algorithms[11].max_time = current_time;
     }
     algorithms[11].avg_time = algorithms[11].total_time / iterations;
-    print_hash("BLAKE3", blake3_hash, HASH_LENGTH);
+    print_hash("BLAKE3", blake3_hash, output_length);
     print_time("BLAKE3", algorithms[11].total_time, algorithms[11].min_time, algorithms[11].max_time, iterations);
     printf("\n");
 
@@ -316,5 +357,10 @@ int main(int argc, char *argv[]) {
         // Printing ranking with colors
         print_colored_summary(algorithms, NUM_ALGORITHMS);
     }
-    return 0;
+
+    if (is_file) {
+        free(data);
     }
+
+    return 0;
+}
