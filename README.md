@@ -45,7 +45,11 @@ Hash Calculator es una herramienta de línea de comandos para calcular los tiemp
 ## Uso
 
 - HashTimeChecker "TEXTO_O_FICHERO_A_HASHEAR" [numero_de_iteraciones] [--summary] [--file] [--output-length=<value>]
+- 
+## Contributors
 
+- [SergioAA](https://github.com/SergioAA)
+  
 ## Screenshot
 
 - ![](https://github.com/DavidSotoDalmau/HashTimeChecker/blob/main/HashTimeChecker.png)
