@@ -65,7 +65,7 @@ void print_colored_summary(HashAlgorithm *algorithms, int num_algorithms) {
         } else {
             color = colors[2]; // Red
         }
-        printf("%s%d. %s - Average Time: %.6f microseconds%s\n", color, i + 1, algorithms[i].name, algorithms[i].avg_time * 1e6, reset_color);
+        printf("%s%d. %s - Average Time: %.6f µs%s\n", color, i + 1, algorithms[i].name, algorithms[i].avg_time * 1e6, reset_color);
     }
 }
 
