@@ -7,6 +7,7 @@ Hash Calculator is a command-line tool for calculating the times of various cryp
 - Support for multiple hash algorithms.
 - Measurement of calculation time for each hash.
 - Easy to use from the command line.
+- Support for average time in N iterations.
 
 ## Supported Algorithms
 
@@ -40,4 +41,4 @@ Hash Calculator is a command-line tool for calculating the times of various cryp
 
 ## Uso
 
-- HashTimeChecker "TEXT_TO_BE_HASHED"
+- HashTimeChecker "TEXT_TO_BE_HASHED" [Iterations]
