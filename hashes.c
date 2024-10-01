@@ -37,7 +37,7 @@ void print_time(const char *algorithm, double total_time, double min_time, doubl
     double avg_microseconds = microseconds / iterations;
     double min_microseconds = min_time * 1e6;
     double max_microseconds = max_time * 1e6;
-    printf("%s - Total Time: %.6f microseconds, Average Time: %.6f microseconds, Min Time: %.6f microseconds, Max Time: %.6f microseconds\n", 
+    printf("%s - Total Time: %.6f µs, Average Time: %.6f µs, Min Time: %.6f µs, Max Time: %.6f µs\n", 
            algorithm, microseconds, avg_microseconds, min_microseconds, max_microseconds);
 }
 
