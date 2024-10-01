@@ -26,7 +26,7 @@ double calculate_time(struct timespec start, struct timespec end) {
 void print_time(const char *algorithm, double total_time, int iterations) {
     double microseconds = total_time * 1e6;
     double avg_microseconds = microseconds / iterations;
-    printf("%s - Total Time for %i iterations: %.6f microseconds\n Average Time: %.6f microseconds\n", iterations, algorithm, microseconds, avg_microseconds);
+    printf("%s - Total Time for %d iterations: %.6f microseconds\n Average Time: %.6f microseconds\n", iterations, algorithm, microseconds, avg_microseconds);
 }
 
 int main(int argc, char *argv[]) {
