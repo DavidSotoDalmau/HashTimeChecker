@@ -8,6 +8,7 @@ Hash Calculator es una herramienta de línea de comandos para calcular los tiemp
 - Medición del tiempo de cálculo para cada hash.
 - Fácil de usar desde la línea de comandos.
 - Soporte para cálculo medio con N iteraciones.
+- Posibilidad de mostrar el ranking con los mejores algoritmos.
 
 ## Algoritmos soportados
 
@@ -41,4 +42,4 @@ Hash Calculator es una herramienta de línea de comandos para calcular los tiemp
 
 ## Uso
 
-- HashTimeChecker "TEXTO_A_HASHEAR" [numero_de_iteraciones]
+- HashTimeChecker "TEXTO_A_HASHEAR" [numero_de_iteraciones] [--summary]
